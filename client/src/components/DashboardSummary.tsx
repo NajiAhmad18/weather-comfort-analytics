@@ -25,8 +25,19 @@ export const DashboardSummary: React.FC<DashboardSummaryProps> = ({
       <div className="summary-section">
         <span className="summary-label">Most Comfortable</span>
         <span className="summary-value">
-          {topCityName ? topCityName : 'N/A'}{' '}
-          {topComfortScore ? <span className="highlight-score">{topComfortScore.toFixed(1)}</span> : null}
+          {topCityName ? (
+            <>
+              <span className="summary-value-city">{topCityName}</span>
+              {topComfortScore ? (
+                <>
+                  <span className="summary-value-separator">·</span>
+                  <span className="highlight-score">{topComfortScore.toFixed(1)}</span>
+                </>
+              ) : null}
+            </>
+          ) : (
+            'N/A'
+          )}
         </span>
       </div>
       <div className="summary-divider"></div>

@@ -56,15 +56,23 @@ export const CityCard: React.FC<CityCardProps> = ({ city, isTopThree }) => {
 
       <div className="city-card-footer">
         <div className="breakdown-metrics">
-          <span className="breakdown-metric">Temp {city.comfortBreakdown.temperatureScore}</span>
-          <span className="breakdown-divider">·</span>
-          <span className="breakdown-metric">Humidity {city.comfortBreakdown.humidityScore}</span>
-          <span className="breakdown-divider">·</span>
-          <span className="breakdown-metric">Wind {city.comfortBreakdown.windScore}</span>
+          <div className="breakdown-metric">
+            <span className="breakdown-label">Temp</span>
+            <span className="breakdown-value">{city.comfortBreakdown.temperatureScore}</span>
+          </div>
+          <div className="breakdown-metric">
+            <span className="breakdown-label">Humidity</span>
+            <span className="breakdown-value">{city.comfortBreakdown.humidityScore}</span>
+          </div>
+          <div className="breakdown-metric">
+            <span className="breakdown-label">Wind</span>
+            <span className="breakdown-value">{city.comfortBreakdown.windScore}</span>
+          </div>
         </div>
-        <span className={`cache-indicator cache-${city.cacheStatus.toLowerCase()}`}>
-          <span className="cache-dot"></span> CACHE {city.cacheStatus}
-        </span>
+        <div className={`cache-indicator cache-${city.cacheStatus.toLowerCase()}`}>
+          <div className="cache-dot"></div>
+          <span>CACHE {city.cacheStatus}</span>
+        </div>
       </div>
     </div>
   );
