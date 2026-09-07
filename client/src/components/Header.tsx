@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 
 interface HeaderProps {
   onRefresh?: () => void;
@@ -6,22 +7,44 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onRefresh, isRefreshing }) => {
+  const { isAuthenticated, user, logout } = useAuth0();
+
+  const handleLogout = () => {
+    logout({
+      logoutParams: {
+        returnTo: window.location.origin,
+      },
+    });
+  };
+
   return (
     <header className="header">
       <div className="header-brand">
         <h1 className="header-title">Weather Comfort Analytics</h1>
         <p className="header-subtitle">Real-time weather rankings & comfort index assessment across global cities</p>
       </div>
-      {onRefresh && (
-        <button
-          className="refresh-btn"
-          onClick={onRefresh}
-          disabled={isRefreshing}
-          aria-label="Refresh weather data"
-        >
-          {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
-        </button>
-      )}
+
+      <div className="header-controls">
+        {isAuthenticated && user && (
+          <div className="user-profile-summary">
+            <span className="user-name">{user.name || user.email}</span>
+            <button className="logout-btn" onClick={handleLogout} aria-label="Log out">
+              Log Out
+            </button>
+          </div>
+        )}
+
+        {onRefresh && (
+          <button
+            className="refresh-btn"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            aria-label="Refresh weather data"
+          >
+            {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+          </button>
+        )}
+      </div>
     </header>
   );
 };
