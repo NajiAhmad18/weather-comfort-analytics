@@ -1,6 +1,7 @@
 import request from 'supertest';
 import express, { Express } from 'express';
 import weatherRoutes from '../src/routes/weather.routes';
+import { authErrorHandler } from '../src/middleware/auth-error.middleware';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -11,12 +12,15 @@ function buildApp(): Express {
   app.use(express.json());
   app.get('/api/health', (_req, res) => res.status(200).json({ status: 'ok' }));
   app.use('/api', weatherRoutes);
+  // Mirror the production error handler so tests see JSON, not HTML.
+  app.use(authErrorHandler);
   return app;
 }
 
+
 // ---------------------------------------------------------------------------
 // Suite 1 — Auth0 configured: protected routes must reject unauthenticated
-//            requests with 401, not pass them through.
+//            requests with 401 JSON — no stack traces, no paths.
 // ---------------------------------------------------------------------------
 
 describe('Auth0 Backend Security — Auth0 configured, no token', () => {
@@ -39,16 +43,33 @@ describe('Auth0 Backend Security — Auth0 configured, no token', () => {
     expect(res.body).toHaveProperty('status', 'ok');
   });
 
-  it('GET /api/weather/rankings without Authorization token should return 401', async () => {
+  it('GET /api/weather/rankings without token: 401 clean JSON', async () => {
     const res = await request(app).get('/api/weather/rankings');
     expect(res.status).toBe(401);
+    // Must be JSON, not HTML
+    expect(res.headers['content-type']).toMatch(/application\/json/);
+    expect(res.body).toHaveProperty('error', 'Unauthorized');
+    // Must not leak stack trace or filesystem paths
+    const bodyText = JSON.stringify(res.body);
+    expect(bodyText).not.toContain('UnauthorizedError');
+    expect(bodyText).not.toContain('node_modules');
+    expect(bodyText).not.toContain('/Users/');
+    expect(bodyText).not.toContain('at ');
   });
 
-  it('GET /api/cache/status without Authorization token should return 401', async () => {
+  it('GET /api/cache/status without token: 401 clean JSON', async () => {
     const res = await request(app).get('/api/cache/status');
     expect(res.status).toBe(401);
+    expect(res.headers['content-type']).toMatch(/application\/json/);
+    expect(res.body).toHaveProperty('error', 'Unauthorized');
+    const bodyText = JSON.stringify(res.body);
+    expect(bodyText).not.toContain('UnauthorizedError');
+    expect(bodyText).not.toContain('node_modules');
+    expect(bodyText).not.toContain('/Users/');
+    expect(bodyText).not.toContain('at ');
   });
 });
+
 
 // ---------------------------------------------------------------------------
 // Suite 2 — FAIL CLOSED: Auth0 NOT configured — protected routes must return
