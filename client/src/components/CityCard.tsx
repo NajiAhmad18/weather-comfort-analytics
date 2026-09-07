@@ -13,10 +13,12 @@ export const CityCard: React.FC<CityCardProps> = ({ city, isTopThree }) => {
   return (
     <div className={`city-card ${isTopThree ? 'top-three' : ''}`}>
       <div className="city-card-header">
-        <div className="city-rank-badge">#{city.rank}</div>
-        <div className="city-info">
-          <h3 className="city-name">{city.cityName}</h3>
-          <span className="city-country">{city.country}</span>
+        <div className="city-card-header-left">
+          <div className="city-rank-badge">#{city.rank}</div>
+          <div className="city-info">
+            <h3 className="city-name">{city.cityName}</h3>
+            <span className="city-country">{city.country}</span>
+          </div>
         </div>
         <div className={`comfort-badge ${category.className}`}>
           {category.label}
@@ -25,10 +27,10 @@ export const CityCard: React.FC<CityCardProps> = ({ city, isTopThree }) => {
 
       <div className="city-card-body">
         <div className="comfort-score-container">
-          <span className="score-label">Comfort Score</span>
+          <span className="score-label">Comfort Index</span>
           <div className="score-display">
             <span className="score-value">{city.comfortScore.toFixed(1)}</span>
-            <span className="score-max">/ 100</span>
+            <span className="score-max">/100</span>
           </div>
         </div>
 
@@ -50,16 +52,27 @@ export const CityCard: React.FC<CityCardProps> = ({ city, isTopThree }) => {
             <span className="detail-value">{city.windSpeed.toFixed(1)} m/s</span>
           </div>
         </div>
-
-        <div className="breakdown-pills">
-          <span className="pill">Temp: {city.comfortBreakdown.temperatureScore}</span>
-          <span className="pill">Humidity: {city.comfortBreakdown.humidityScore}</span>
-          <span className="pill">Wind: {city.comfortBreakdown.windScore}</span>
-        </div>
       </div>
 
       <div className="city-card-footer">
-        <span className="cache-indicator">Cache: {city.cacheStatus}</span>
+        <div className="breakdown-metrics">
+          <div className="breakdown-metric">
+            <span className="breakdown-label">Temp</span>
+            <span className="breakdown-value">{city.comfortBreakdown.temperatureScore}</span>
+          </div>
+          <div className="breakdown-metric">
+            <span className="breakdown-label">Humidity</span>
+            <span className="breakdown-value">{city.comfortBreakdown.humidityScore}</span>
+          </div>
+          <div className="breakdown-metric">
+            <span className="breakdown-label">Wind</span>
+            <span className="breakdown-value">{city.comfortBreakdown.windScore}</span>
+          </div>
+        </div>
+        <div className={`cache-indicator cache-${city.cacheStatus.toLowerCase()}`}>
+          <div className="cache-dot"></div>
+          <span>CACHE {city.cacheStatus}</span>
+        </div>
       </div>
     </div>
   );

@@ -26,24 +26,25 @@ export const Header: React.FC<HeaderProps> = ({ onRefresh, isRefreshing }) => {
 
       <div className="header-controls">
         {isAuthenticated && user && (
-          <div className="user-profile-summary">
-            <span className="user-name">{user.name || user.email}</span>
+          <span className="user-email">{user.email || user.name}</span>
+        )}
+        <div className="header-actions">
+          {isAuthenticated && user && (
             <button className="logout-btn" onClick={handleLogout} aria-label="Log out">
-              Log Out
+              Log out
             </button>
-          </div>
-        )}
-
-        {onRefresh && (
-          <button
-            className="refresh-btn"
-            onClick={onRefresh}
-            disabled={isRefreshing}
-            aria-label="Refresh weather data"
-          >
-            {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
-          </button>
-        )}
+          )}
+          {onRefresh && (
+            <button
+              className="refresh-btn"
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              aria-label="Refresh weather data"
+            >
+              {isRefreshing ? 'Refreshing...' : 'Refresh data'}
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );
