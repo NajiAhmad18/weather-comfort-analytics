@@ -16,6 +16,7 @@ A secure full-stack weather analytics application built as a take-home assignmen
 - Sanitized authentication error responses (no stack traces or internal paths exposed)
 - Responsive dashboard with city search, sorting, and comfort-range filtering
 - Partial failure handling: cities that fail to load are reported separately without blocking the rest
+- Temperature Trend Graph: a professional SVG visualization of real OpenWeather forecast data (approximately the next 24 hours at 3-hour intervals), with raw forecast responses cached server-side for 5 minutes. This is forecast data, not historical weather.
 
 ---
 
@@ -275,6 +276,7 @@ Never commit `.env` files. Both are listed in `.gitignore`.
 | `GET` | `/api/health` | Public | Server health check |
 | `GET` | `/api/weather/rankings` | Protected (Bearer JWT) | Returns ranked city comfort data |
 | `GET` | `/api/cache/status` | Protected (Bearer JWT) | Returns cache hit/miss statistics and TTL |
+| `GET` | `/api/weather/forecast/:cityCode` | Protected (Bearer JWT) | Returns ~24-hour temperature forecast for a configured city (raw response cached 5 min) |
 
 Missing Auth0 configuration returns `503` on protected routes. Invalid or absent tokens return `401`.
 
