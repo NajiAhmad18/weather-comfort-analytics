@@ -1,15 +1,16 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import { Header } from '../components/Header';
 import { DashboardSummary } from '../components/DashboardSummary';
 import { DashboardControls } from '../components/DashboardControls';
 import type { ComfortFilterOption, SortOption } from '../components/DashboardControls';
 import { CityRankingGrid } from '../components/CityRankingGrid';
 import { EmptyState, ErrorState, LoadingState, PartialFailureNotice } from '../components/FeedbackStates';
-
 import { weatherApiClient } from '../services/weather-api.service';
 import type { WeatherRankingResponse } from '../types/weather-api.types';
 
 export const DashboardPage: React.FC = () => {
+  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   const [data, setData] = useState<WeatherRankingResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +29,20 @@ export const DashboardPage: React.FC = () => {
     setError(null);
 
     try {
-      const response = await weatherApiClient.fetchRankings();
+      let token: string | undefined;
+      if (isAuthenticated && import.meta.env.VITE_AUTH0_DOMAIN) {
+        try {
+          token = await getAccessTokenSilently({
+            authorizationParams: {
+              audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+            },
+          });
+        } catch (tokenErr) {
+          console.warn('Failed to obtain Auth0 access token silently:', tokenErr);
+        }
+      }
+
+      const response = await weatherApiClient.fetchRankings(token);
       setData(response);
     } catch (err: any) {
       setError(err.message || 'Failed to load weather data');
@@ -37,6 +51,7 @@ export const DashboardPage: React.FC = () => {
       setIsRefreshing(false);
     }
   };
+
 
   useEffect(() => {
     loadData();
