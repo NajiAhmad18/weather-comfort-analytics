@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Header } from '../components/Header';
 import { DashboardSummary } from '../components/DashboardSummary';
@@ -20,7 +20,7 @@ export const DashboardPage: React.FC = () => {
   const [sortOption, setSortOption] = useState<SortOption>('comfort-desc');
   const [comfortFilter, setComfortFilter] = useState<ComfortFilterOption>('all');
 
-  const loadData = async (isManualRefresh: boolean = false) => {
+  const loadData = useCallback(async (isManualRefresh: boolean = false) => {
     if (isManualRefresh) {
       setIsRefreshing(true);
     } else {
@@ -57,12 +57,12 @@ export const DashboardPage: React.FC = () => {
       setLoading(false);
       setIsRefreshing(false);
     }
-  };
+  }, [getAccessTokenSilently]);
 
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   const processedCities = useMemo(() => {
     if (!data || !data.cities) return [];
