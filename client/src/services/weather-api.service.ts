@@ -9,8 +9,13 @@ export class WeatherApiClient {
     this.baseUrl = baseUrl.replace(/\/$/, '');
   }
 
-  public async fetchRankings(): Promise<WeatherRankingResponse> {
-    const response = await fetch(`${this.baseUrl}/api/weather/rankings`);
+  public async fetchRankings(accessToken?: string): Promise<WeatherRankingResponse> {
+    const headers: Record<string, string> = {};
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    const response = await fetch(`${this.baseUrl}/api/weather/rankings`, { headers });
     
     if (!response.ok) {
       const errorText = await response.text().catch(() => '');
@@ -20,8 +25,13 @@ export class WeatherApiClient {
     return response.json();
   }
 
-  public async fetchCacheStatus(): Promise<CacheStatusResponse> {
-    const response = await fetch(`${this.baseUrl}/api/cache/status`);
+  public async fetchCacheStatus(accessToken?: string): Promise<CacheStatusResponse> {
+    const headers: Record<string, string> = {};
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    const response = await fetch(`${this.baseUrl}/api/cache/status`, { headers });
 
     if (!response.ok) {
       throw new Error(`Failed to fetch cache status (${response.status})`);
@@ -30,5 +40,6 @@ export class WeatherApiClient {
     return response.json();
   }
 }
+
 
 export const weatherApiClient = new WeatherApiClient();
