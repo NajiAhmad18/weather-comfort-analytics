@@ -1,5 +1,6 @@
 import React from 'react';
 import { TemperatureTrendChart } from './TemperatureTrendChart';
+import { ForecastCitySelect } from './ForecastCitySelect';
 import type { CityForecastResponse } from '../types/weather-api.types';
 
 interface TemperatureTrendPanelProps {
@@ -32,35 +33,12 @@ export const TemperatureTrendPanel: React.FC<TemperatureTrendPanelProps> = ({
               Forecast cache &middot; <span className={`cache-text-${forecastData.cacheStatus.toLowerCase()}`}>{forecastData.cacheStatus}</span>
             </span>
           )}
-          <div className="select-wrapper">
-            <select
-              className="controls-select forecast-city-select"
-              value={selectedCityCode || ''}
-              onChange={(e) => onCitySelect(Number(e.target.value))}
-              aria-label="Select city for forecast"
-              disabled={isLoading || availableCities.length === 0}
-            >
-              {availableCities.map((city) => (
-                <option key={city.cityCode} value={city.cityCode}>
-                  {city.cityName}
-                </option>
-              ))}
-            </select>
-            <svg
-              className="select-chevron"
-              xmlns="http://www.w3.org/2000/svg"
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
+          <ForecastCitySelect
+            cities={availableCities}
+            selectedCityCode={selectedCityCode}
+            onCitySelect={onCitySelect}
+            disabled={isLoading || availableCities.length === 0}
+          />
         </div>
       </div>
 
