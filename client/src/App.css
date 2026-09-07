@@ -643,3 +643,24 @@
     font-size: 26px;
   }
 }
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  margin-right: 4px;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-color);
+  color: var(--text-main);
+}
