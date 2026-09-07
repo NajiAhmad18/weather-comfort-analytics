@@ -8,10 +8,11 @@ export async function getWeatherRankingsController(req: Request, res: Response):
   try {
     const result = await analyticsService.getRankedCityWeather();
     res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : undefined;
     res.status(500).json({
       error: 'Internal Server Error',
-      message: error.message || 'An unexpected error occurred while fetching weather rankings',
+      message: errorMessage || 'An unexpected error occurred while fetching weather rankings',
     });
   }
 }
@@ -23,10 +24,11 @@ export function getCacheStatusController(req: Request, res: Response): void {
       timestamp: new Date().toISOString(),
       cache: stats,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : undefined;
     res.status(500).json({
       error: 'Internal Server Error',
-      message: error.message || 'Failed to retrieve cache status',
+      message: errorMessage || 'Failed to retrieve cache status',
     });
   }
 }
