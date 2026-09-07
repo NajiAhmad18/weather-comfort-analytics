@@ -1,22 +1,29 @@
 :root {
   --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --bg-color: #f8fafc;
+  --bg-color: #f1f5f9;
   --card-bg: #ffffff;
   --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border-color: #e2e8f0;
+  --text-muted: #475569;
+  --border-color: #cbd5e1;
   
   --primary-color: #2563eb;
   --primary-hover: #1d4ed8;
   
-  --badge-excellent-bg: #dcfce7;
+  --badge-excellent-bg: #f0fdf4;
   --badge-excellent-text: #166534;
-  --badge-comfortable-bg: #e0f2fe;
+  --badge-excellent-border: #bbf7d0;
+
+  --badge-comfortable-bg: #f0f9ff;
   --badge-comfortable-text: #075985;
-  --badge-moderate-bg: #fef3c7;
+  --badge-comfortable-border: #bae6fd;
+
+  --badge-moderate-bg: #fffbeb;
   --badge-moderate-text: #92400e;
-  --badge-low-bg: #fee2e2;
+  --badge-moderate-border: #fef08a;
+
+  --badge-low-bg: #fef2f2;
   --badge-low-text: #991b1b;
+  --badge-low-border: #fecaca;
 }
 
 * {
@@ -34,7 +41,7 @@ body {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 1.5rem 1rem;
+  padding: 2rem 1.5rem;
 }

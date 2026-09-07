@@ -32,7 +32,7 @@ export const DashboardControls: React.FC<ControlsProps> = ({
         <input
           type="text"
           className="search-input"
-          placeholder="Search city name..."
+          placeholder="Search city or country..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
         />

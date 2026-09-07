@@ -59,7 +59,9 @@ export const CityCard: React.FC<CityCardProps> = ({ city, isTopThree }) => {
       </div>
 
       <div className="city-card-footer">
-        <span className="cache-indicator">Cache: {city.cacheStatus}</span>
+        <span className={`cache-indicator cache-${city.cacheStatus.toLowerCase()}`}>
+          Cache: {city.cacheStatus}
+        </span>
       </div>
     </div>
   );
