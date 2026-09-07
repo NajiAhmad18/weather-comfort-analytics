@@ -6,6 +6,10 @@ import { LoadingState } from './components/FeedbackStates';
 import { DashboardPage } from './pages/DashboardPage';
 import './App.css';
 
+/**
+ * Rendered inside Auth0ProviderWithConfig, which guarantees Auth0 is fully
+ * configured before this component mounts.
+ */
 const MainContent: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth0();
 
@@ -17,7 +21,9 @@ const MainContent: React.FC = () => {
     );
   }
 
-  if (!isAuthenticated && import.meta.env.VITE_AUTH0_DOMAIN) {
+  // Auth0 is configured (guaranteed by Auth0ProviderWithConfig). If the user
+  // is not authenticated, show the login screen — never the dashboard.
+  if (!isAuthenticated) {
     return <LoginLanding />;
   }
 
@@ -33,4 +39,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
