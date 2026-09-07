@@ -20,7 +20,24 @@ export const DashboardPage: React.FC = () => {
   const [sortOption, setSortOption] = useState<SortOption>('comfort-desc');
   const [comfortFilter, setComfortFilter] = useState<ComfortFilterOption>('all');
 
-  const loadData = useCallback(async (isManualRefresh: boolean = false) => {
+  const fetchRankingsData = useCallback(async () => {
+    let token: string;
+    try {
+      token = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: import.meta.env.VITE_AUTH0_AUDIENCE as string,
+        },
+      });
+    } catch (tokenErr: unknown) {
+      const message =
+        tokenErr instanceof Error ? tokenErr.message : 'Authentication session error.';
+      console.error('Failed to obtain Auth0 access token:', tokenErr);
+      throw new Error(`Session error: ${message} Please sign in again.`);
+    }
+    return await weatherApiClient.fetchRankings(token);
+  }, [getAccessTokenSilently]);
+
+  const loadData = async (isManualRefresh: boolean = false) => {
     if (isManualRefresh) {
       setIsRefreshing(true);
     } else {
@@ -29,26 +46,7 @@ export const DashboardPage: React.FC = () => {
     setError(null);
 
     try {
-      // Retrieve the Auth0 access token. If this fails the request must be
-      // aborted — we must NOT call the API without a token.
-      let token: string;
-      try {
-        token = await getAccessTokenSilently({
-          authorizationParams: {
-            audience: import.meta.env.VITE_AUTH0_AUDIENCE as string,
-          },
-        });
-      } catch (tokenErr: unknown) {
-        const message =
-          tokenErr instanceof Error ? tokenErr.message : 'Authentication session error.';
-        console.error('Failed to obtain Auth0 access token:', tokenErr);
-        setError(`Session error: ${message} Please sign in again.`);
-        setLoading(false);
-        setIsRefreshing(false);
-        return;
-      }
-
-      const response = await weatherApiClient.fetchRankings(token);
+      const response = await fetchRankingsData();
       setData(response);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to load weather data.';
@@ -57,12 +55,35 @@ export const DashboardPage: React.FC = () => {
       setLoading(false);
       setIsRefreshing(false);
     }
-  }, [getAccessTokenSilently]);
-
+  };
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    let isMounted = true;
+    const initialize = async () => {
+      try {
+        const response = await fetchRankingsData();
+        if (isMounted) {
+          setData(response);
+          setError(null);
+        }
+      } catch (err: unknown) {
+        if (isMounted) {
+          const message = err instanceof Error ? err.message : 'Failed to load weather data.';
+          setError(message);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    initialize();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchRankingsData]);
 
   const processedCities = useMemo(() => {
     if (!data || !data.cities) return [];
