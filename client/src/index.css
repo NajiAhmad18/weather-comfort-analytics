@@ -29,6 +29,22 @@
   --badge-low-bg: #fef2f2;
   --badge-low-text: #991b1b;
   --badge-low-border: #fecaca;
+
+  --error-bg: #fef2f2;
+  --error-border: #fecaca;
+  --error-text: #991b1b;
+  --error-action-bg: #ffffff;
+  --error-action-border: #fca5a5;
+  --error-action-text: #dc2626;
+
+  --warning-bg: #fffbeb;
+  --warning-border: #fef08a;
+  --warning-text: #92400e;
+
+  --rank-accent-bg: #eff6ff;
+  --rank-accent-text: #2563eb;
+
+  color-scheme: light;
 }
 
 * {
@@ -50,4 +66,52 @@ body {
   max-width: 1240px;
   margin: 0 auto;
   padding: 24px 24px 40px;
+}
+
+[data-theme='dark'] {
+  --bg-color: #0b1120;
+  --card-bg: #111827;
+
+  --text-main: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-tertiary: #475569;
+
+  --border-color: #273449;
+  --border-light: #1e293b;
+
+  --primary-color: #3b82f6;
+  --primary-hover: #60a5fa;
+
+  --badge-excellent-bg: rgba(22, 101, 52, 0.2);
+  --badge-excellent-text: #4ade80;
+  --badge-excellent-border: rgba(34, 197, 94, 0.2);
+
+  --badge-comfortable-bg: rgba(7, 89, 133, 0.2);
+  --badge-comfortable-text: #38bdf8;
+  --badge-comfortable-border: rgba(14, 165, 233, 0.2);
+
+  --badge-moderate-bg: rgba(146, 64, 14, 0.2);
+  --badge-moderate-text: #fbbf24;
+  --badge-moderate-border: rgba(245, 158, 11, 0.2);
+
+  --badge-low-bg: rgba(153, 27, 27, 0.2);
+  --badge-low-text: #f87171;
+  --badge-low-border: rgba(239, 68, 68, 0.2);
+
+  --error-bg: #3f1515;
+  --error-border: #7f1d1d;
+  --error-text: #fca5a5;
+  --error-action-bg: #111827;
+  --error-action-border: #991b1b;
+  --error-action-text: #f87171;
+
+  --warning-bg: #3b2008;
+  --warning-border: #78350f;
+  --warning-text: #fcd34d;
+
+  --rank-accent-bg: rgba(37, 99, 235, 0.15);
+  --rank-accent-text: #60a5fa;
+
+  color-scheme: dark;
 }

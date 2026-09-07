@@ -272,8 +272,8 @@
 }
 
 .city-card.top-three .city-rank-badge {
-  background: #eff6ff;
-  color: var(--primary-color);
+  background: var(--rank-accent-bg);
+  color: var(--rank-accent-text);
 }
 
 .city-info {
@@ -484,13 +484,13 @@
 
 .error-container {
   padding: 32px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
   border-radius: 8px;
 }
 
 .error-title {
-  color: #991b1b;
+  color: var(--error-text);
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 8px;
@@ -498,9 +498,9 @@
 
 .retry-btn {
   margin-top: 20px;
-  background: #ffffff;
-  color: #dc2626;
-  border: 1px solid #fca5a5;
+  background: var(--error-action-bg);
+  color: var(--error-action-text);
+  border: 1px solid var(--error-action-border);
   height: 36px;
   padding: 0 16px;
   border-radius: 6px;
@@ -511,13 +511,13 @@
 }
 
 .retry-btn:hover {
-  background: #fef2f2;
+  background: var(--error-bg);
 }
 
 .partial-failure-notice {
-  background: #fffbeb;
-  border: 1px solid #fef08a;
-  color: #92400e;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  color: var(--warning-text);
   padding: 16px 20px;
   border-radius: 8px;
   margin-bottom: 24px;
@@ -573,9 +573,9 @@
 }
 
 .login-error-notice {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #991b1b;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
   padding: 12px;
   border-radius: 6px;
   font-size: 13px;
@@ -583,7 +583,6 @@
   margin-bottom: 24px;
 }
 
-/* 7. Responsive */
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
@@ -642,4 +641,25 @@
   .score-value {
     font-size: 26px;
   }
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  margin-right: 4px;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-color);
+  color: var(--text-main);
 }
