@@ -128,7 +128,7 @@ Cities are sorted by Comfort Index descending. If two cities share the same scor
 
 ## Weather Data and Cities
 
-City codes are read from `server/src/data/cities.json`, which contains OpenWeather City ID codes and city names. At startup (and on each rankings request) the loader validates that at least 10 valid city entries are present.
+City codes are read from `server/src/data/cities.json`, which contains OpenWeather City ID codes and city names. On each rankings request, the loader reads the file and validates that at least 10 valid city entries are present.
 
 Weather is fetched from the OpenWeather Current Weather API (`/data/2.5/weather`) using city codes, with results returned in metric units (°C, m/s).
 
@@ -321,7 +321,7 @@ npm run lint
 - The application depends on a valid OpenWeather API key. Requests fail if the key is absent or invalid.
 - The in-memory cache is lost on every process restart. There is no warm-up on startup.
 - Auth0 tenant configuration (application settings, API, users, MFA) is external to this repository and must be completed manually before authentication works end-to-end.
-- City data is read from a static `cities.json` file. Adding or removing cities requires a server restart.
+- City configuration is file-based and static rather than managed through a database or administrative interface.
 
 ---
 
