@@ -1,0 +1,76 @@
+{
+  "List": [
+    {
+      "CityCode": "1248991",
+      "CityName": "Colombo",
+      "Temp": "33.0",
+      "Status": "Clouds"
+    },
+    {
+      "CityCode": "1850147",
+      "CityName": "Tokyo",
+      "Temp": "8.0",
+      "Status": "Clear"
+    },
+    {
+      "CityCode": "2643743",
+      "CityName": "London",
+      "Temp": "9.0",
+      "Status": "Rain"
+    },
+    {
+      "CityCode": "5128581",
+      "CityName": "New York",
+      "Temp": "12.0",
+      "Status": "Clear"
+    },
+    {
+      "CityCode": "2988507",
+      "CityName": "Paris",
+      "Temp": "11.0",
+      "Status": "Clouds"
+    },
+    {
+      "CityCode": "2147714",
+      "CityName": "Sydney",
+      "Temp": "22.0",
+      "Status": "Sunny"
+    },
+    {
+      "CityCode": "1275339",
+      "CityName": "Mumbai",
+      "Temp": "30.0",
+      "Status": "Haze"
+    },
+    {
+      "CityCode": "2950159",
+      "CityName": "Berlin",
+      "Temp": "7.0",
+      "Status": "Rain"
+    },
+    {
+      "CityCode": "1880252",
+      "CityName": "Singapore",
+      "Temp": "31.0",
+      "Status": "Thunderstorm"
+    },
+    {
+      "CityCode": "1609350",
+      "CityName": "Bangkok",
+      "Temp": "34.0",
+      "Status": "Clouds"
+    },
+    {
+      "CityCode": "108410",
+      "CityName": "Riyadh",
+      "Temp": "28.0",
+      "Status": "Clear"
+    },
+    {
+      "CityCode": "3169070",
+      "CityName": "Rome",
+      "Temp": "15.0",
+      "Status": "Clear"
+    }
+  ]
+}
