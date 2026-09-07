@@ -10,7 +10,7 @@ import { weatherApiClient } from '../services/weather-api.service';
 import type { WeatherRankingResponse } from '../types/weather-api.types';
 
 export const DashboardPage: React.FC = () => {
-  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+  const { getAccessTokenSilently } = useAuth0();
   const [data, setData] = useState<WeatherRankingResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,23 +29,30 @@ export const DashboardPage: React.FC = () => {
     setError(null);
 
     try {
-      let token: string | undefined;
-      if (isAuthenticated && import.meta.env.VITE_AUTH0_DOMAIN) {
-        try {
-          token = await getAccessTokenSilently({
-            authorizationParams: {
-              audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-            },
-          });
-        } catch (tokenErr) {
-          console.warn('Failed to obtain Auth0 access token silently:', tokenErr);
-        }
+      // Retrieve the Auth0 access token. If this fails the request must be
+      // aborted — we must NOT call the API without a token.
+      let token: string;
+      try {
+        token = await getAccessTokenSilently({
+          authorizationParams: {
+            audience: import.meta.env.VITE_AUTH0_AUDIENCE as string,
+          },
+        });
+      } catch (tokenErr: unknown) {
+        const message =
+          tokenErr instanceof Error ? tokenErr.message : 'Authentication session error.';
+        console.error('Failed to obtain Auth0 access token:', tokenErr);
+        setError(`Session error: ${message} Please sign in again.`);
+        setLoading(false);
+        setIsRefreshing(false);
+        return;
       }
 
       const response = await weatherApiClient.fetchRankings(token);
       setData(response);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load weather data');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to load weather data.';
+      setError(message);
     } finally {
       setLoading(false);
       setIsRefreshing(false);
