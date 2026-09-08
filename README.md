@@ -17,6 +17,7 @@ A secure full-stack weather analytics application built as a take-home assignmen
 - Responsive dashboard with city search, sorting, and comfort-range filtering
 - Partial failure handling: cities that fail to load are reported separately without blocking the rest
 - Temperature Trend Graph: a professional SVG visualization of real OpenWeather forecast data (approximately the next 24 hours at 3-hour intervals), with raw forecast responses cached server-side for 5 minutes. This is forecast data, not historical weather.
+- Persistent light/dark theme with system-preference fallback and saved user preference
 
 ---
 
@@ -129,11 +130,13 @@ Cities are sorted by Comfort Index descending. If two cities share the same scor
 
 ## Weather Data and Cities
 
-The assignment-provided `cities.json` contains eight city entries. Because the assignment requires at least ten cities to be processed, all eight supplied entries and their CityCode values are preserved, and four additional valid OpenWeather city IDs (London, New York, Singapore, and Rome) are included, giving 12 configured cities in total. On each rankings request, the loader reads `server/src/data/cities.json` and validates that at least 10 valid city entries are present.
+The assignment-provided `cities.json` contains eight city entries. Because the assignment requires at least ten cities to be processed, all eight supplied entries and their CityCode values are preserved, and four additional valid OpenWeather city IDs (London, New York, Singapore, and Rome) are included, giving 12 configured cities in total. On each rankings request, the loader validates that at least 10 valid city entries are present.
 
 Only `CityCode` and `CityName` are used as input for live requests; the supplied `Temp` and `Status` fields are retained exactly for source-file fidelity but are not used by the analytics pipeline. The four added entries omit these optional fields. Current weather always comes from OpenWeather.
 
 Weather is fetched from the OpenWeather Current Weather API (`/data/2.5/weather`) using city codes, with results returned in metric units (°C, m/s).
+
+The server build copies `src/data/cities.json` into `dist/data` so the compiled application loads the same configuration.
 
 ---
 
@@ -167,7 +170,7 @@ Authentication uses Auth0 Universal Login. The flow:
 6. If Auth0 configuration (`AUTH0_DOMAIN` or `AUTH0_AUDIENCE`) is absent at request time, protected endpoints return `503 { "error": "Authentication service is not configured." }` rather than allowing access (fail-closed).
 7. The React frontend also fails closed: if any of `VITE_AUTH0_DOMAIN`, `VITE_AUTH0_CLIENT_ID`, or `VITE_AUTH0_AUDIENCE` are absent at build/runtime, the dashboard is never rendered and a configuration error screen is shown instead.
 
-Public signups should be disabled in the Auth0 Dashboard. Users must be manually provisioned by an administrator. MFA is configured with OTP and Email factors and the policy is set to Always.
+For a reviewer-controlled dashboard, disable public signups, enable only the Username-Password-Authentication database connection, and manually provision reviewer users. Disable social/Google login for the SPA. Configure OTP and Email MFA factors with the MFA policy set to Always.
 
 ---
 
@@ -259,7 +262,7 @@ Never commit `.env` files. Both are listed in `.gitignore`.
 
 3. **Database Connection**: Authentication > Database > Username-Password-Authentication.
    - Disable "Allow signups" so that only manually created users can authenticate.
-   - Disable unnecessary social connections if present.
+   - Disable social/Google login for the SPA.
 
 4. **Create Users**: User Management > Users > Create User.
    - Manually add each user who should have access to the dashboard.
@@ -286,6 +289,8 @@ Missing Auth0 configuration returns `503` on protected routes. Invalid or absent
 
 ## Testing and Build Verification
 
+The Comfort Index has dedicated unit coverage for temperature, humidity, wind, weighting, and score clamping.
+
 ```bash
 # Run all server tests
 cd server
@@ -301,6 +306,15 @@ npm run build
 # Lint the client
 npm run lint
 ```
+
+---
+
+## Bonus Features Implemented
+
+- Dark mode — persistent theme with system-preference fallback.
+- Comfort Index unit tests — dedicated coverage for the scoring function.
+- Frontend search/sorting/filtering — dashboard controls for city results.
+- Temperature trend graph — approximately 24 hours of 3-hour OpenWeather forecast data per selected city.
 
 ---
 
