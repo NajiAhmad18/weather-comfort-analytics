@@ -1,8 +1,8 @@
 export interface CityConfig {
   CityCode: string;
   CityName: string;
-  Temp: string;
-  Status: string;
+  Temp?: string;
+  Status?: string;
 }
 
 export interface CityData {
