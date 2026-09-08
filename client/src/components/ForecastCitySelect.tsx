@@ -22,17 +22,28 @@ export const ForecastCitySelect: React.FC<ForecastCitySelectProps> = ({
   const selectedCity = cities.find((c) => c.cityCode === selectedCityCode);
   const selectedIndex = cities.findIndex((c) => c.cityCode === selectedCityCode);
 
+  const closeAndRestoreFocus = useCallback(() => {
+    setIsOpen(false);
+    setFocusedIndex(-1);
+    triggerRef.current?.focus();
+  }, []);
+
+  const closeWithoutFocusRestore = useCallback(() => {
+    setIsOpen(false);
+    setFocusedIndex(-1);
+  }, []);
+
   // Close on outside click
   useEffect(() => {
     if (!isOpen) return;
     const handlePointerDown = (e: PointerEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
+        closeWithoutFocusRestore();
       }
     };
     document.addEventListener('pointerdown', handlePointerDown);
     return () => document.removeEventListener('pointerdown', handlePointerDown);
-  }, [isOpen]);
+  }, [isOpen, closeWithoutFocusRestore]);
 
   // Scroll focused option into view
   useEffect(() => {
@@ -43,33 +54,31 @@ export const ForecastCitySelect: React.FC<ForecastCitySelectProps> = ({
     }
   }, [focusedIndex, isOpen]);
 
+  // Focus listbox when opened
+  useEffect(() => {
+    if (isOpen) {
+      listRef.current?.focus();
+    }
+  }, [isOpen]);
+
   const open = useCallback(() => {
     if (disabled) return;
     setIsOpen(true);
     setFocusedIndex(selectedIndex >= 0 ? selectedIndex : 0);
   }, [disabled, selectedIndex]);
 
-  const close = useCallback(() => {
-    setIsOpen(false);
-    setFocusedIndex(-1);
-    triggerRef.current?.focus();
-  }, []);
-
   const selectCity = useCallback((cityCode: number) => {
     if (cityCode !== selectedCityCode) {
       onCitySelect(cityCode);
     }
-    close();
-  }, [selectedCityCode, onCitySelect, close]);
+    closeAndRestoreFocus();
+  }, [selectedCityCode, onCitySelect, closeAndRestoreFocus]);
 
   const handleTriggerKeyDown = (e: React.KeyboardEvent) => {
     switch (e.key) {
       case 'Enter':
       case ' ':
       case 'ArrowDown':
-        e.preventDefault();
-        open();
-        break;
       case 'ArrowUp':
         e.preventDefault();
         open();
@@ -104,10 +113,10 @@ export const ForecastCitySelect: React.FC<ForecastCitySelectProps> = ({
         break;
       case 'Escape':
         e.preventDefault();
-        close();
+        closeAndRestoreFocus();
         break;
       case 'Tab':
-        close();
+        closeWithoutFocusRestore();
         break;
     }
   };
@@ -118,7 +127,7 @@ export const ForecastCitySelect: React.FC<ForecastCitySelectProps> = ({
         ref={triggerRef}
         type="button"
         className="forecast-select-trigger"
-        onClick={() => (isOpen ? close() : open())}
+        onClick={() => (isOpen ? closeWithoutFocusRestore() : open())}
         onKeyDown={handleTriggerKeyDown}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -154,6 +163,11 @@ export const ForecastCitySelect: React.FC<ForecastCitySelectProps> = ({
           aria-label="Select city for temperature forecast"
           onKeyDown={handleListKeyDown}
           tabIndex={-1}
+          aria-activedescendant={
+            focusedIndex >= 0
+              ? `forecast-city-option-${cities[focusedIndex].cityCode}`
+              : undefined
+          }
         >
           {cities.map((city, index) => {
             const isSelected = city.cityCode === selectedCityCode;
@@ -161,6 +175,7 @@ export const ForecastCitySelect: React.FC<ForecastCitySelectProps> = ({
             return (
               <div
                 key={city.cityCode}
+                id={`forecast-city-option-${city.cityCode}`}
                 role="option"
                 aria-selected={isSelected}
                 className={
