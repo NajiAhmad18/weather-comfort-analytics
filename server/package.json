@@ -4,7 +4,7 @@
   "description": "Backend service for weather analytics and comfort index ranking",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node scripts/copy-static-assets.js",
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "test": "jest"
