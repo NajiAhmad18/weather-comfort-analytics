@@ -37,3 +37,16 @@ export interface CacheStatusResponse {
   timestamp: string;
   cache: CacheStats;
 }
+
+export interface ForecastPoint {
+  timestamp: string;
+  temperature: number;
+}
+
+export interface CityForecastResponse {
+  cityCode: number;
+  cityName: string;
+  generatedAt: string;
+  cacheStatus: 'HIT' | 'MISS';
+  points: ForecastPoint[];
+}

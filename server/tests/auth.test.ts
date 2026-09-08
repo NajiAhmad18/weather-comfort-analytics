@@ -68,6 +68,18 @@ describe('Auth0 Backend Security — Auth0 configured, no token', () => {
     expect(bodyText).not.toContain('/Users/');
     expect(bodyText).not.toContain('at ');
   });
+
+  it('GET /api/weather/forecast/2643743 without token: 401 clean JSON', async () => {
+    const res = await request(app).get('/api/weather/forecast/2643743');
+    expect(res.status).toBe(401);
+    expect(res.headers['content-type']).toMatch(/application\/json/);
+    expect(res.body).toHaveProperty('error', 'Unauthorized');
+    const bodyText = JSON.stringify(res.body);
+    expect(bodyText).not.toContain('UnauthorizedError');
+    expect(bodyText).not.toContain('node_modules');
+    expect(bodyText).not.toContain('/Users/');
+    expect(bodyText).not.toContain('at ');
+  });
 });
 
 
@@ -106,5 +118,13 @@ describe('Auth0 Backend Security — Auth0 NOT configured (fail-closed)', () => 
     expect(res.body).toHaveProperty('error', 'Authentication service is not configured.');
     expect(res.body).not.toHaveProperty('entries');
     expect(res.body).not.toHaveProperty('cache');
+  });
+
+  it('GET /api/weather/forecast/2643743 must return 503 when Auth0 is not configured', async () => {
+    const res = await request(app).get('/api/weather/forecast/2643743');
+    expect(res.status).toBe(503);
+    expect(res.body).toHaveProperty('error', 'Authentication service is not configured.');
+    expect(res.body).not.toHaveProperty('points');
+    expect(res.body).not.toHaveProperty('cityCode');
   });
 });

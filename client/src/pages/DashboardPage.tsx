@@ -7,7 +7,8 @@ import type { ComfortFilterOption, SortOption } from '../components/DashboardCon
 import { CityRankingGrid } from '../components/CityRankingGrid';
 import { EmptyState, ErrorState, LoadingState, PartialFailureNotice } from '../components/FeedbackStates';
 import { weatherApiClient } from '../services/weather-api.service';
-import type { WeatherRankingResponse } from '../types/weather-api.types';
+import type { WeatherRankingResponse, CityForecastResponse } from '../types/weather-api.types';
+import { TemperatureTrendPanel } from '../components/TemperatureTrendPanel';
 
 export const DashboardPage: React.FC = () => {
   const { getAccessTokenSilently } = useAuth0();
@@ -19,6 +20,11 @@ export const DashboardPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [sortOption, setSortOption] = useState<SortOption>('comfort-desc');
   const [comfortFilter, setComfortFilter] = useState<ComfortFilterOption>('all');
+
+  const [selectedForecastCityCode, setSelectedForecastCityCode] = useState<number | null>(null);
+  const [forecastData, setForecastData] = useState<CityForecastResponse | null>(null);
+  const [forecastLoading, setForecastLoading] = useState<boolean>(false);
+  const [forecastError, setForecastError] = useState<string | null>(null);
 
   const fetchRankingsData = useCallback(async () => {
     let token: string;
@@ -48,6 +54,9 @@ export const DashboardPage: React.FC = () => {
     try {
       const response = await fetchRankingsData();
       setData(response);
+      setSelectedForecastCityCode((prev) =>
+        prev === null && response.cities.length > 0 ? response.cities[0].cityCode : prev
+      );
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to load weather data.';
       setError(message);
@@ -65,6 +74,9 @@ export const DashboardPage: React.FC = () => {
         if (isMounted) {
           setData(response);
           setError(null);
+          setSelectedForecastCityCode((prev) =>
+            prev === null && response.cities.length > 0 ? response.cities[0].cityCode : prev
+          );
         }
       } catch (err: unknown) {
         if (isMounted) {
@@ -85,12 +97,47 @@ export const DashboardPage: React.FC = () => {
     };
   }, [fetchRankingsData]);
 
+  // Load forecast data when selected city changes
+  useEffect(() => {
+    if (!selectedForecastCityCode) return;
+    let isMounted = true;
+
+    const loadForecast = async () => {
+      setForecastLoading(true);
+      setForecastError(null);
+      try {
+        const token = await getAccessTokenSilently({
+          authorizationParams: {
+            audience: import.meta.env.VITE_AUTH0_AUDIENCE as string,
+          },
+        });
+        const response = await weatherApiClient.fetchForecast(selectedForecastCityCode, token);
+        if (isMounted) {
+          setForecastData(response);
+        }
+      } catch (err: unknown) {
+        if (isMounted) {
+          const message = err instanceof Error ? err.message : 'Failed to load forecast';
+          setForecastError(message);
+        }
+      } finally {
+        if (isMounted) {
+          setForecastLoading(false);
+        }
+      }
+    };
+
+    loadForecast();
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedForecastCityCode, getAccessTokenSilently]);
+
   const processedCities = useMemo(() => {
     if (!data || !data.cities) return [];
 
     let filtered = [...data.cities];
 
-    // Search filter
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -98,7 +145,6 @@ export const DashboardPage: React.FC = () => {
       );
     }
 
-    // Comfort score filter
     if (comfortFilter === 'high') {
       filtered = filtered.filter((c) => c.comfortScore >= 80);
     } else if (comfortFilter === 'moderate') {
@@ -107,7 +153,6 @@ export const DashboardPage: React.FC = () => {
       filtered = filtered.filter((c) => c.comfortScore < 60);
     }
 
-    // Sorting (preserves backend-assigned `rank` property)
     filtered.sort((a, b) => {
       switch (sortOption) {
         case 'comfort-desc':
@@ -127,6 +172,11 @@ export const DashboardPage: React.FC = () => {
 
     return filtered;
   }, [data, searchTerm, sortOption, comfortFilter]);
+
+  const availableForecastCities = useMemo(() => {
+    if (!data || !data.cities) return [];
+    return data.cities.map(c => ({ cityCode: c.cityCode, cityName: c.cityName }));
+  }, [data]);
 
   const topCity = data?.cities && data.cities.length > 0 ? data.cities[0] : undefined;
 
@@ -159,6 +209,15 @@ export const DashboardPage: React.FC = () => {
               onSortChange={setSortOption}
               comfortFilter={comfortFilter}
               onFilterChange={setComfortFilter}
+            />
+
+            <TemperatureTrendPanel
+              forecastData={forecastData}
+              isLoading={forecastLoading}
+              error={forecastError}
+              availableCities={availableForecastCities}
+              selectedCityCode={selectedForecastCityCode}
+              onCitySelect={setSelectedForecastCityCode}
             />
 
             {processedCities.length === 0 ? (
