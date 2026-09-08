@@ -43,7 +43,7 @@ export class ForecastService {
     return this.normalizeForecast(rawData, city.cityCode, city.cityName, cacheStatus, Date.now());
   }
 
-  private fetchFromOpenWeatherApi(cityCode: number): Promise<OpenWeatherForecastResponse> {
+  protected fetchFromOpenWeatherApi(cityCode: number): Promise<OpenWeatherForecastResponse> {
     return new Promise((resolve, reject) => {
       const url = `https://api.openweathermap.org/data/2.5/forecast?id=${cityCode}&appid=${this.apiKey}&units=metric`;
       const client = url.startsWith('https') ? https : http;
