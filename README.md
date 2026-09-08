@@ -129,7 +129,9 @@ Cities are sorted by Comfort Index descending. If two cities share the same scor
 
 ## Weather Data and Cities
 
-City codes are read from `server/src/data/cities.json`, which contains OpenWeather City ID codes and city names. On each rankings request, the loader reads the file and validates that at least 10 valid city entries are present.
+The assignment-provided `cities.json` contains eight city entries. Because the assignment requires at least ten cities to be processed, all eight supplied entries and their CityCode values are preserved, and four additional valid OpenWeather city IDs (London, New York, Singapore, and Rome) are included, giving 12 configured cities in total. On each rankings request, the loader reads `server/src/data/cities.json` and validates that at least 10 valid city entries are present.
+
+Only `CityCode` and `CityName` are used as input for live requests; the supplied `Temp` and `Status` fields are retained exactly for source-file fidelity but are not used by the analytics pipeline. The four added entries omit these optional fields. Current weather always comes from OpenWeather.
 
 Weather is fetched from the OpenWeather Current Weather API (`/data/2.5/weather`) using city codes, with results returned in metric units (°C, m/s).
 
