@@ -39,9 +39,18 @@ const forecastService = new ForecastService();
 export async function getCityForecastController(req: Request, res: Response): Promise<void> {
   try {
     const cityCodeParam = req.params.cityCode;
-    const cityCode = parseInt(cityCodeParam, 10);
 
-    if (isNaN(cityCode)) {
+    if (!/^\d+$/.test(cityCodeParam)) {
+      res.status(400).json({
+        error: 'Bad Request',
+        message: 'Invalid city code format',
+      });
+      return;
+    }
+
+    const cityCode = Number(cityCodeParam);
+
+    if (!Number.isSafeInteger(cityCode) || cityCode <= 0) {
       res.status(400).json({
         error: 'Bad Request',
         message: 'Invalid city code format',
