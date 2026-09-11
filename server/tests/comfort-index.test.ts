@@ -2,6 +2,7 @@ import {
   calculateComfortIndex,
   calculateHumidityScore,
   calculateTemperatureScore,
+  calculateVisibilityScore,
   calculateWindScore,
 } from '../src/services/comfort-index.service';
 import { clamp } from '../src/utils/comfort-math.util';
@@ -87,32 +88,56 @@ describe('Comfort Index Calculation', () => {
     });
   });
 
+  describe('calculateVisibilityScore', () => {
+    it('should convert visibility to a 0-100 score', () => {
+      expect(calculateVisibilityScore(10000)).toBe(100);
+      expect(calculateVisibilityScore(5000)).toBe(50);
+      expect(calculateVisibilityScore(0)).toBe(0);
+    });
+
+    it('should clamp visibility score between 0 and 100', () => {
+      expect(calculateVisibilityScore(15000)).toBe(100);
+      expect(calculateVisibilityScore(-1000)).toBe(0);
+    });
+  });
+
   describe('calculateComfortIndex weighting', () => {
     it('should produce 100 for all ideal parameters', () => {
-      const result = calculateComfortIndex(21, 50, 3);
+      const result = calculateComfortIndex(21, 50, 3, 10000);
       expect(result.temperatureScore).toBe(100);
       expect(result.humidityScore).toBe(100);
       expect(result.windScore).toBe(100);
+      expect(result.visibilityScore).toBe(100);
       expect(result.totalComfortIndex).toBe(100);
     });
 
-    it('should correctly calculate weighted index with 50/30/20 breakdown', () => {
-      // Temp: 25°C (Score 92) * 0.5 = 46
-      // Humidity: 70% (Score 75) * 0.3 = 22.5
-      // Wind: 7 m/s (Score 70) * 0.2 = 14
-      // Total: 46 + 22.5 + 14 = 82.5
-      const result = calculateComfortIndex(25, 70, 7);
+    it('should correctly calculate weighted index with 40/24/16/20 breakdown', () => {
+      // Temp: 25°C (Score 92) * 0.4 = 36.8
+      // Humidity: 70% (Score 75) * 0.24 = 18
+      // Wind: 7 m/s (Score 70) * 0.16 = 11.2
+      // Visibility: 10000m (Score 100) * 0.2 = 20
+      // Total: 36.8 + 18 + 11.2 + 20 = 86
+      const result = calculateComfortIndex(25, 70, 7, 10000);
       expect(result.temperatureScore).toBe(92);
       expect(result.humidityScore).toBe(75);
       expect(result.windScore).toBe(70);
-      expect(result.totalComfortIndex).toBe(82.5);
+      expect(result.visibilityScore).toBe(100);
+      expect(result.totalComfortIndex).toBe(86);
+    });
+
+    it('should reduce the Comfort Index when visibility is lower', () => {
+      const clearVisibility = calculateComfortIndex(22, 50, 2, 10000);
+      const reducedVisibility = calculateComfortIndex(22, 50, 2, 5000);
+
+      expect(clearVisibility.totalComfortIndex).toBe(100);
+      expect(reducedVisibility.totalComfortIndex).toBe(90);
     });
 
     it('should clamp final score between 0 and 100', () => {
-      const extremeBad = calculateComfortIndex(50, 100, 20);
+      const extremeBad = calculateComfortIndex(50, 100, 20, 0);
       expect(extremeBad.totalComfortIndex).toBe(0);
 
-      const perfect = calculateComfortIndex(22, 50, 2);
+      const perfect = calculateComfortIndex(22, 50, 2, 10000);
       expect(perfect.totalComfortIndex).toBe(100);
     });
   });

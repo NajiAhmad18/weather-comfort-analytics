@@ -32,7 +32,8 @@ export class WeatherAnalyticsService {
         const comfortBreakdown = calculateComfortIndex(
           weather.temperatureCelsius,
           weather.humidity,
-          weather.windSpeed
+          weather.windSpeed,
+          weather.visibility
         );
 
         rankedList.push({
