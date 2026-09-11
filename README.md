@@ -6,7 +6,7 @@ A secure full-stack weather analytics application built as a take-home assignmen
 
 ## Features
 
-- Custom weighted Comfort Index based on temperature, humidity, and wind speed
+- Custom weighted Comfort Index based on temperature, humidity, wind speed, and visibility
 - City weather ranking from most to least comfortable
 - 5-minute server-side cache for raw OpenWeather API responses
 - Cache HIT/MISS debug endpoint
@@ -76,19 +76,20 @@ weather-comfort-analytics/
 
 ## Comfort Index
 
-The Comfort Index is a single score from 0 to 100 calculated server-side for each city. It combines three sub-scores, each independently scored 0–100, using fixed weights.
+The Comfort Index is a single score from 0 to 100 calculated server-side for each city. It combines four sub-scores—temperature, humidity, wind, and visibility—each independently scored 0–100 using fixed weights.
 
 ### Formula
 
 ```
-Comfort Index = (Temperature Score × 0.50)
-              + (Humidity Score    × 0.30)
-              + (Wind Score        × 0.20)
+Comfort Index = (Temperature Score × 0.40)
+              + (Humidity Score    × 0.24)
+              + (Wind Score        × 0.16)
+              + (Visibility Score  × 0.20)
 ```
 
 The result is clamped to [0, 100] and rounded to one decimal place. Each sub-score is also rounded to one decimal place before being included in the response breakdown.
 
-### Temperature Score (weight: 50%)
+### Temperature Score (weight: 40%)
 
 | Condition | Score |
 |---|---|
@@ -97,9 +98,9 @@ The result is clamped to [0, 100] and rounded to one decimal place. Each sub-sco
 
 Penalty: 8 points per degree Celsius outside the ideal band. A temperature of 10°C yields a score of 36. A temperature of 30°C yields a score of 52.
 
-Temperature receives the highest weight because it is the dominant factor in perceived outdoor comfort.
+Temperature still has the highest weight and remains the strongest general factor in outdoor comfort.
 
-### Humidity Score (weight: 30%)
+### Humidity Score (weight: 24%)
 
 | Condition | Score |
 |---|---|
@@ -108,9 +109,9 @@ Temperature receives the highest weight because it is the dominant factor in per
 
 Penalty: 2.5 points per percentage point outside the ideal band. Humidity at 0% or 100% scores 0.
 
-Humidity has a moderate weight because it significantly affects perceived temperature but is less immediately impactful than air temperature itself.
+Humidity still has a moderate weight because it affects perceived temperature.
 
-### Wind Speed Score (weight: 20%)
+### Wind Speed Score (weight: 16%)
 
 | Condition | Score |
 |---|---|
@@ -120,7 +121,21 @@ Humidity has a moderate weight because it significantly affects perceived temper
 
 Still air carries a lighter penalty than strong wind because calm conditions are generally preferable to gusty ones.
 
-Wind carries the lowest weight as it is the least decisive factor in broad city-level comfort comparisons.
+Wind has a 16% weight; it remains useful but is less important than temperature and humidity in broad city-level comfort comparisons.
+
+### Visibility Score (weight: 20%)
+
+OpenWeather visibility is provided in metres. Visibility of 10,000 metres or more receives a score of 100; lower values are scaled proportionally and the result is clamped to 0–100.
+
+| Condition | Score |
+|---|---|
+| 10,000 m or more | 100 |
+| 5,000 m | 50 |
+| 0 m | 0 |
+
+Visibility Score = clamp((visibilityMeters / 10000) × 100, 0, 100)
+
+Visibility has a 20% weight and represents how clear the surrounding conditions are. Reduced visibility can make outdoor conditions less comfortable and less pleasant.
 
 ### Ranking and Tie-Breaking
 
@@ -289,7 +304,7 @@ Missing Auth0 configuration returns `503` on protected routes. Invalid or absent
 
 ## Testing and Build Verification
 
-The Comfort Index has dedicated unit coverage for temperature, humidity, wind, weighting, and score clamping.
+The Comfort Index has dedicated unit coverage for temperature, humidity, wind, visibility, weighting, and score clamping.
 
 ```bash
 # Run all server tests
@@ -320,7 +335,7 @@ npm run lint
 
 ## Design Decisions
 
-**Custom weighted Comfort Index** — A single score derived from temperature, humidity, and wind speed gives reviewers a clear, comparable metric for each city. Weights reflect the relative human impact of each factor.
+**Custom weighted Comfort Index** — A single score derived from temperature, humidity, wind speed, and visibility gives reviewers a clear, comparable metric for each city. When Visibility was added, the original 50 / 30 / 20 weights were reduced proportionally to 40 / 24 / 16 / 20, preserving the relative importance of the original parameters while adding Visibility.
 
 **Server-side computation** — All weather fetching and Comfort Index calculation happens on the backend. The frontend receives pre-ranked data, which keeps client-side logic simple and the computation testable.
 
