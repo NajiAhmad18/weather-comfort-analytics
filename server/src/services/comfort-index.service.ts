@@ -6,6 +6,11 @@ import { clamp } from '../utils/comfort-math.util';
  * Ideal range: 18°C - 24°C (Score 100).
  * Outside range: 8 points lost per °C deviation.
  */
+
+export function calculateVisibilityScore(visibilityMeters: number): number {
+  return clamp((visibilityMeters / 10000) * 100, 0, 100);
+}
+
 export function calculateTemperatureScore(tempCelsius: number): number {
   if (tempCelsius >= 18 && tempCelsius <= 24) {
     return 100;
@@ -48,19 +53,22 @@ export function calculateWindScore(windSpeedMs: number): number {
 
 /**
  * Calculates weighted Comfort Index (0 - 100).
- * Weights: Temperature (50%), Humidity (30%), Wind (20%).
+ * Weights: Temperature (40%), Humidity (24%), Wind (16%), Visibility (20%).
  * Output rounded to 1 decimal place.
  */
 export function calculateComfortIndex(
   tempCelsius: number,
   humidityPercent: number,
-  windSpeedMs: number
+  windSpeedMs: number,
+  visibilityMeters: number
 ): ComfortBreakdown {
   const tempScore = calculateTemperatureScore(tempCelsius);
   const humidityScore = calculateHumidityScore(humidityPercent);
   const windScore = calculateWindScore(windSpeedMs);
+  const visibilityScore = calculateVisibilityScore(visibilityMeters);
 
-  const rawTotal = tempScore * 0.5 + humidityScore * 0.3 + windScore * 0.2;
+
+  const rawTotal = tempScore * 0.4 + humidityScore * 0.24 + windScore * 0.16 + visibilityScore * 0.2;
   const clampedTotal = clamp(rawTotal, 0, 100);
   const roundedTotal = Math.round(clampedTotal * 10) / 10;
 
@@ -68,6 +76,7 @@ export function calculateComfortIndex(
     temperatureScore: Math.round(tempScore * 10) / 10,
     humidityScore: Math.round(humidityScore * 10) / 10,
     windScore: Math.round(windScore * 10) / 10,
+    visibilityScore: Math.round(visibilityScore * 10) / 10,
     totalComfortIndex: roundedTotal,
   };
 }
